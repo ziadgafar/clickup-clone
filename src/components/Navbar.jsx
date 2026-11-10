@@ -1,6 +1,13 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+
+const tab = ({ isActive }) =>
+  `flex-1 py-3 text-center text-sm border-b-2 transition-colors md:flex-none md:py-0 md:text-base md:border-0 ${
+    isActive
+      ? "border-black dark:border-white text-black dark:text-white font-semibold"
+      : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white"
+  }`;
 
 const SunIcon = () => (
   <svg
@@ -61,27 +68,22 @@ export default function Navbar() {
       </Link>
 
       {user?.approved && (
-        <div className="flex gap-6 whitespace-nowrap order-last w-full md:order-none md:w-auto">
-          <Link
-            to="/projects"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
-          >
+        // Mobile: full-bleed tab strip under the logo row. md+: inline links.
+        <div className="order-last basis-full grow -mx-4 sm:-mx-6 -mb-4 flex whitespace-nowrap border-t border-neutral-200 dark:border-neutral-700 md:order-0 md:basis-auto md:grow-0 md:m-0 md:gap-6 md:border-0">
+          <NavLink to="/dashboard" className={tab}>
+            My Tasks
+          </NavLink>
+          <NavLink to="/projects" className={tab}>
             Projects
-          </Link>
+          </NavLink>
           {user.role === "admin" && (
-            <Link
-              to="/users"
-              className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
-            >
+            <NavLink to="/users" className={tab}>
               Team
-            </Link>
+            </NavLink>
           )}
-          <Link
-            to="/connect"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
-          >
+          <NavLink to="/connect" className={tab}>
             Connect Claude
-          </Link>
+          </NavLink>
         </div>
       )}
 

@@ -41,6 +41,11 @@ function TaskCard({ task, onClick }) {
       className="bg-white dark:bg-neutral-700 rounded-xl p-3 shadow-sm cursor-grab active:cursor-grabbing"
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
+      {task.project && (
+        <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+          {task.project}
+        </p>
+      )}
       <p className="text-sm font-bold text-black dark:text-white mb-2">
         {task.title}
       </p>

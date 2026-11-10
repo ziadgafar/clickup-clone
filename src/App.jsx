@@ -4,12 +4,13 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Projects from "./pages/Projects";
+import Dashboard from "./pages/Dashboard";
 import ProjectDetail from "./pages/ProjectDetail";
 import Users from "./pages/Users";
 import ConnectClaude from "./pages/ConnectClaude";
 import Layout from "./components/Layout";
 
-// Hidden for now (files kept): Home, Dashboard, Clients.
+// Hidden for now (files kept): Home, Clients.
 
 function ProtectedRoute({ children, adminOnly }) {
   const { user, loading } = useAuth();
@@ -41,6 +42,14 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/projects"
               element={
