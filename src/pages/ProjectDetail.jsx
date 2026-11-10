@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase, q } from "../supabase";
 import KanbanBoard from "../components/KanbanBoard";
 import CreateTaskModal from "../components/CreateTaskModal";
@@ -12,9 +12,32 @@ export default function ProjectDetail() {
   const [showModal, setShowModal] = useState(false);
   const [archived, setArchived] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
-  const [assignee, setAssignee] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [projects, setProjects] = useState([]);
+  const [people, setPeople] = useState([]);
+  const navigate = useNavigate();
+  // filters live in the URL so they survive switching projects and can be linked to
+  const [params, setParams] = useSearchParams();
+  const assignee = params.get("assignee") || "";
+  const from = params.get("from") || "";
+  const to = params.get("to") || "";
+  const setParam = (key) => (e) => {
+    const next = new URLSearchParams(params);
+    if (e.target.value) next.set(key, e.target.value);
+    else next.delete(key);
+    setParams(next, { replace: true });
+  };
+
+  useEffect(() => {
+    Promise.all([
+      q(supabase.from("projects").select("id, name").order("name")),
+      q(supabase.from("profiles").select("name").eq("approved", true).order("name")),
+    ])
+      .then(([p, u]) => {
+        setProjects(p);
+        setPeople(u.map((x) => x.name));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -45,7 +68,6 @@ export default function ProjectDetail() {
     }
   };
 
-  const assignees = [...new Set(tasks.map((t) => t.assignee).filter(Boolean))].sort();
   const visible = (t) => {
     const created = new Date(t.created_at).toLocaleDateString("en-CA"); // local YYYY-MM-DD
     return (
@@ -63,9 +85,21 @@ export default function ProjectDetail() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-black text-black dark:text-white">
-            {project?.name}
-          </h1>
+          <select
+            value={id}
+            onChange={(e) => navigate(`/projects/${e.target.value}?${params}`)}
+            aria-label="Switch project"
+            className="text-3xl font-black text-black dark:text-white bg-transparent cursor-pointer max-w-full"
+          >
+            {!projects.some((p) => String(p.id) === id) && (
+              <option value={id}>{project?.name}</option>
+            )}
+            {projects.map((p) => (
+              <option key={p.id} value={p.id} className="text-base text-black">
+                {p.name}
+              </option>
+            ))}
+          </select>
           <p className="text-neutral-500 dark:text-neutral-400 mt-1">
             {project?.description || "No description provided."}
           </p>
@@ -94,24 +128,24 @@ export default function ProjectDetail() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
+        <select value={assignee} onChange={setParam("assignee")} className={field}>
           <option value="">All assignees</option>
           <option value="-">Unassigned</option>
-          {assignees.map((a) => (
+          {people.map((a) => (
             <option key={a} value={a}>{a}</option>
           ))}
         </select>
         <label className="flex items-center gap-2 text-sm text-neutral-500">
           Created from
-          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={field} />
+          <input type="date" value={from} onChange={setParam("from")} className={field} />
         </label>
         <label className="flex items-center gap-2 text-sm text-neutral-500">
           to
-          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={field} />
+          <input type="date" value={to} onChange={setParam("to")} className={field} />
         </label>
         {(assignee || from || to) && (
           <button
-            onClick={() => { setAssignee(""); setFrom(""); setTo(""); }}
+            onClick={() => setParams({}, { replace: true })}
             className="text-sm font-bold text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer"
           >
             Clear
