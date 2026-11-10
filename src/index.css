@@ -6,3 +6,23 @@
 :root {
   font-family: 'Inter', sans-serif;
 }
+/* Loading state set by src/supabase.js */
+button[data-busy] {
+  opacity: 0.7;
+  cursor: wait;
+}
+button[data-busy]::before {
+  content: "";
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.5em;
+  vertical-align: -0.125em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
