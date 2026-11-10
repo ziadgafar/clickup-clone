@@ -114,6 +114,16 @@ export default function TaskDetailModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm(`Delete "${task.title}"? This can't be undone.`)) return;
+    try {
+      await q(supabase.from("tasks").delete().eq("id", task.id));
+      onUpdated();
+    } catch (err) {
+      alert(err.message || "Failed to delete task.");
+    }
+  };
+
   const PRIORITY_COLORS = {
     low: "bg-green-100 text-green-700",
     medium: "bg-yellow-100 text-yellow-700",
@@ -152,6 +162,14 @@ export default function TaskDetailModal({
                 className="px-2 py-1 text-xs font-bold border border-neutral-200 dark:border-neutral-600 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer"
               >
                 Archive
+              </button>
+            )}
+            {!isEditing && (
+              <button
+                onClick={handleDelete}
+                className="px-2 py-1 text-xs font-bold border border-red-200 dark:border-red-900 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 text-red-500 transition-all cursor-pointer"
+              >
+                Delete
               </button>
             )}
             {!isEditing && (

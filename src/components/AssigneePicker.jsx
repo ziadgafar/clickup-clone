@@ -20,7 +20,7 @@ export default function AssigneePicker({ value, onChange, people, me, className 
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-3 py-2 border border-neutral-200 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white text-sm cursor-pointer"
+        className="w-full h-10 flex items-center gap-2 px-3 border border-neutral-200 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white text-sm cursor-pointer"
       >
         {value && value !== "-" && <Avatar name={value} className="w-5 h-5 text-[9px]" />}
         <span className="truncate">{label(value)}</span>
