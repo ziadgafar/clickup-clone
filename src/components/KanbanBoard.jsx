@@ -63,18 +63,26 @@ function TaskCard({ task, onClick }) {
         </div>
       )}
 
-      {task.assignee && (
-        <div className="flex items-center gap-2 mt-1">
-          <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(task.assignee)}&background=0D8ABC&color=fff`}
-            alt=""
-            className="w-6 h-6 rounded-full"
-          />
-          <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate">
-            {task.assignee}
-          </span>
-        </div>
-      )}
+      <div className="flex items-center gap-2 mt-1">
+        {task.assignee && (
+          <>
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(task.assignee)}&background=0D8ABC&color=fff`}
+              alt=""
+              className="w-6 h-6 rounded-full"
+            />
+            <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate">
+              {task.assignee}
+            </span>
+          </>
+        )}
+        <span
+          title={`Created ${new Date(task.created_at).toLocaleString()}`}
+          className="ml-auto shrink-0 text-xs text-neutral-400"
+        >
+          {new Date(task.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
+        </span>
+      </div>
     </div>
   );
 }
