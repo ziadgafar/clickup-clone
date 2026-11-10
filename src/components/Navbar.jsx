@@ -60,7 +60,7 @@ export default function Navbar() {
         />
       </Link>
 
-      {user && (
+      {user?.approved && (
         <div className="flex gap-6 whitespace-nowrap">
           <Link
             to="/projects"

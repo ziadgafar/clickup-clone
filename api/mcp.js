@@ -238,12 +238,20 @@ export default async function handler(req, res) {
   const token = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "") || req.query.token;
   if (!token) return res.status(401).json({ error: "Missing token. Get one at /connect." });
 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY)
+    return res.status(500).json({ error: "Server misconfigured: SUPABASE_SERVICE_ROLE_KEY not set in Vercel." });
+
   const db = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
   });
   const hash = createHash("sha256").update(token).digest("hex");
-  const { data: row } = await db.from("api_tokens").select("user_id").eq("token_hash", hash).maybeSingle();
+  const { data: row } = await db
+    .from("api_tokens")
+    .select("user_id, profiles(approved)")
+    .eq("token_hash", hash)
+    .maybeSingle();
   if (!row) return res.status(401).json({ error: "Invalid token. Generate a new one at /connect." });
+  if (!row.profiles?.approved) return res.status(403).json({ error: "Account not approved by an admin." });
 
   const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
   if (Array.isArray(body)) {

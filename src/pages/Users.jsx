@@ -14,7 +14,9 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      setUsers(await q(supabase.from("profiles").select("*").order("name")));
+      setUsers(
+        await q(supabase.from("profiles").select("*").order("approved").order("name")),
+      );
     } catch {
       setUsers([]);
     } finally {
@@ -26,6 +28,15 @@ export default function Users() {
     user.role === "admin" || user.id === targetUser.id;
 
   const canDelete = () => user.role === "admin";
+
+  const handleApprove = async (id) => {
+    try {
+      await q(supabase.from("profiles").update({ approved: true }).eq("id", id));
+      fetchUsers();
+    } catch (err) {
+      alert(err.message || "Failed to approve user.");
+    }
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
@@ -42,7 +53,9 @@ export default function Users() {
       <div className="mb-8">
         <h1 className="text-3xl font-black text-black dark:text-white">Team</h1>
         <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-          {users.length} members
+          {users.filter((u) => u.approved).length} members
+          {users.some((u) => !u.approved) &&
+            ` · ${users.filter((u) => !u.approved).length} pending`}
         </p>
       </div>
 
@@ -67,13 +80,28 @@ export default function Users() {
                   <p className="font-bold text-black dark:text-white text-sm">
                     {u.name}
                   </p>
-                  <p className="text-xs text-neutral-400">{u.role}</p>
+                  <p className="text-xs text-neutral-400">
+                    {u.role}
+                    {!u.approved && (
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">
+                        Pending
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">
                 {u.email}
               </p>
               <div className="flex gap-2">
+                {!u.approved && canDelete() && (
+                  <button
+                    onClick={() => handleApprove(u.id)}
+                    className="flex-1 py-1.5 text-xs font-bold bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-400 transition-all cursor-pointer"
+                  >
+                    Approve
+                  </button>
+                )}
                 {canEdit(u) && (
                   <button
                     onClick={() => setEditingUser(u)}

@@ -15,6 +15,20 @@ function ProtectedRoute({ children, adminOnly }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" />;
+  if (!user.approved)
+    return (
+      <Layout>
+        <div className="max-w-md mx-auto mt-20 bg-white dark:bg-neutral-800 p-8 rounded-2xl shadow-sm text-center">
+          <h2 className="text-2xl font-black text-black dark:text-white mb-2">
+            Waiting for approval
+          </h2>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+            An admin needs to approve your account before you can access projects.
+            This page updates when you reload after approval.
+          </p>
+        </div>
+      </Layout>
+    );
   if (adminOnly && user.role !== "admin") return <Navigate to="/projects" />;
   return <Layout>{children}</Layout>;
 }
