@@ -3,8 +3,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Projects from "./pages/Projects";
-import ProjectDetail from "./pages/ProjectDetail";
+import Tasks from "./pages/Tasks";
 import Users from "./pages/Users";
 import ConnectClaude from "./pages/ConnectClaude";
 import Layout from "./components/Layout";
@@ -45,7 +44,7 @@ export default function App() {
               path="/projects"
               element={
                 <ProtectedRoute>
-                  <Projects />
+                  <Tasks />
                 </ProtectedRoute>
               }
             />
@@ -53,7 +52,7 @@ export default function App() {
               path="/projects/:id"
               element={
                 <ProtectedRoute>
-                  <ProjectDetail />
+                  <Tasks />
                 </ProtectedRoute>
               }
             />

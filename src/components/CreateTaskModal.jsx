@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase, q, setTaskTags } from "../supabase";
 
-export default function CreateTaskModal({ onClose, onCreated, projectId }) {
+export default function CreateTaskModal({ onClose, onCreated, projectId, projects = [] }) {
   const loggedInUser = useAuth().user;
   const [tags, setTags] = useState([]);
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
     title: "",
+    project_id: projectId || "",
     description: "",
     status: "todo",
     priority: "medium",
@@ -44,7 +45,6 @@ export default function CreateTaskModal({ onClose, onCreated, projectId }) {
           .from("tasks")
           .insert({
             ...fields,
-            project_id: projectId,
             assigned_to: form.assigned_to || null,
             created_by: loggedInUser.id,
           })
@@ -85,6 +85,24 @@ export default function CreateTaskModal({ onClose, onCreated, projectId }) {
               className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
             />
           </div>
+
+          {!projectId && (
+            <div className="flex flex-col">
+              <p className="text-neutral-400 text-xs pb-0.5">Project</p>
+              <select
+                name="project_id"
+                value={form.project_id}
+                onChange={handleChange}
+                required
+                className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 dark:text-white focus:outline-none"
+              >
+                <option value="">Select project</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex flex-col">
             <p className="text-neutral-400 text-xs pb-0.5">Description</p>

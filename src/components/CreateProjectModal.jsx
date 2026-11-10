@@ -39,8 +39,7 @@ export default function CreateProjectModal({ onClose, onCreated }) {
         ...form,
         client_id: form.client_id || null,
       };
-      await q(supabase.from("projects").insert(payload));
-      onCreated();
+      onCreated(await q(supabase.from("projects").insert(payload).select().single()));
       onClose();
     } catch (err) {
       alert(err.message || "Failed to create project.");
@@ -87,24 +86,7 @@ export default function CreateProjectModal({ onClose, onCreated }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-x-3">
-            <div className="flex flex-col">
-              <p className="text-neutral-400 text-xs pb-0.5">Status</p>
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="px-3 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 dark:text-white focus:outline-none"
-              >
-                <option value="planning">Planning</option>
-                <option value="active">Active</option>
-                <option value="on_hold">On Hold</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col">
+          <div className="flex flex-col">
               <p className="text-neutral-400 text-xs pb-0.5">Priority</p>
               <select
                 name="priority"
@@ -117,7 +99,6 @@ export default function CreateProjectModal({ onClose, onCreated }) {
                 <option value="high">High</option>
               </select>
             </div>
-          </div>
           <div className="flex flex-col">
             <p className="text-neutral-400 text-xs pb-0.5">Client</p>
             <select
