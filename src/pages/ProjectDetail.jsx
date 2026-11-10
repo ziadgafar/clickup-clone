@@ -18,8 +18,7 @@ export default function ProjectDetail() {
   // filters live in the URL so they survive switching projects and can be linked to
   const [params, setParams] = useSearchParams();
   const assignee = params.get("assignee") || "";
-  const from = params.get("from") || "";
-  const to = params.get("to") || "";
+  const created = params.get("created") || "";
   const setParam = (key) => (e) => {
     const next = new URLSearchParams(params);
     if (e.target.value) next.set(key, e.target.value);
@@ -68,14 +67,14 @@ export default function ProjectDetail() {
     }
   };
 
-  const visible = (t) => {
-    const created = new Date(t.created_at).toLocaleDateString("en-CA"); // local YYYY-MM-DD
-    return (
-      (!assignee || (assignee === "-" ? !t.assignee : t.assignee === assignee)) &&
-      (!from || created >= from) &&
-      (!to || created <= to)
-    );
-  };
+  const since = !created
+    ? 0
+    : created === "today"
+      ? new Date().setHours(0, 0, 0, 0)
+      : Date.now() - created * 864e5;
+  const visible = (t) =>
+    (!assignee || (assignee === "-" ? !t.assignee : t.assignee === assignee)) &&
+    new Date(t.created_at) >= since;
   const field =
     "px-3 py-2 border border-neutral-200 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white text-sm";
 
@@ -89,6 +88,7 @@ export default function ProjectDetail() {
             value={id}
             onChange={(e) => navigate(`/projects/${e.target.value}?${params}`)}
             aria-label="Switch project"
+            style={{ fieldSizing: "content" }}
             className="text-3xl font-black text-black dark:text-white bg-transparent cursor-pointer max-w-full"
           >
             {!projects.some((p) => String(p.id) === id) && (
@@ -100,9 +100,11 @@ export default function ProjectDetail() {
               </option>
             ))}
           </select>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-            {project?.description || "No description provided."}
-          </p>
+          {project?.description && (
+            <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+              {project.description}
+            </p>
+          )}
         </div>
         <div className="flex gap-3">
         <button
@@ -128,22 +130,21 @@ export default function ProjectDetail() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <select value={assignee} onChange={setParam("assignee")} className={field}>
+        <select value={assignee} onChange={setParam("assignee")} className={`${field} flex-1 sm:flex-none`}>
           <option value="">All assignees</option>
           <option value="-">Unassigned</option>
           {people.map((a) => (
             <option key={a} value={a}>{a}</option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm text-neutral-500">
-          Created from
-          <input type="date" value={from} onChange={setParam("from")} className={field} />
-        </label>
-        <label className="flex items-center gap-2 text-sm text-neutral-500">
-          to
-          <input type="date" value={to} onChange={setParam("to")} className={field} />
-        </label>
-        {(assignee || from || to) && (
+        <select value={created} onChange={setParam("created")} className={`${field} flex-1 sm:flex-none`}>
+          <option value="">Created any time</option>
+          <option value="today">Created today</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        {(assignee || created) && (
           <button
             onClick={() => setParams({}, { replace: true })}
             className="text-sm font-bold text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer"
