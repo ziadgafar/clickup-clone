@@ -107,7 +107,7 @@ function KanbanColumn({ column, tasks, onTaskClick }) {
   );
 }
 
-export default function KanbanBoard({ tasks, onTasksChange, onRefresh }) {
+export default function KanbanBoard({ tasks, onTasksChange, onRefresh, visible = () => true }) {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const handleDragEnd = async (event) => {
@@ -143,7 +143,7 @@ export default function KanbanBoard({ tasks, onTasksChange, onRefresh }) {
           <KanbanColumn
             key={col}
             column={col}
-            tasks={tasks.filter((t) => t.status === col)}
+            tasks={tasks.filter((t) => t.status === col && visible(t))}
             onTaskClick={setSelectedTask}
           />
         ))}

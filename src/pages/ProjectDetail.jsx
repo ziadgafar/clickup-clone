@@ -12,6 +12,9 @@ export default function ProjectDetail() {
   const [showModal, setShowModal] = useState(false);
   const [archived, setArchived] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
+  const [assignee, setAssignee] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -41,6 +44,18 @@ export default function ProjectDetail() {
       setLoading(false);
     }
   };
+
+  const assignees = [...new Set(tasks.map((t) => t.assignee).filter(Boolean))].sort();
+  const visible = (t) => {
+    const created = new Date(t.created_at).toLocaleDateString("en-CA"); // local YYYY-MM-DD
+    return (
+      (!assignee || (assignee === "-" ? !t.assignee : t.assignee === assignee)) &&
+      (!from || created >= from) &&
+      (!to || created <= to)
+    );
+  };
+  const field =
+    "px-3 py-2 border border-neutral-200 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white text-sm";
 
   if (loading) return <p className="text-neutral-500">Loading...</p>;
 
@@ -78,8 +93,35 @@ export default function ProjectDetail() {
         )}
       </div>
 
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
+          <option value="">All assignees</option>
+          <option value="-">Unassigned</option>
+          {assignees.map((a) => (
+            <option key={a} value={a}>{a}</option>
+          ))}
+        </select>
+        <label className="flex items-center gap-2 text-sm text-neutral-500">
+          Created from
+          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={field} />
+        </label>
+        <label className="flex items-center gap-2 text-sm text-neutral-500">
+          to
+          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={field} />
+        </label>
+        {(assignee || from || to) && (
+          <button
+            onClick={() => { setAssignee(""); setFrom(""); setTo(""); }}
+            className="text-sm font-bold text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       <KanbanBoard
         tasks={tasks}
+        visible={visible}
         onTasksChange={setTasks}
         onRefresh={fetchData}
       />
