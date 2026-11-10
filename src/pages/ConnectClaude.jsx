@@ -49,7 +49,7 @@ export default function ConnectClaude() {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <h1 className="text-3xl font-black text-black dark:text-white">Connect Claude</h1>
       <p className="text-neutral-500 dark:text-neutral-400 mt-1 mb-8">
         Let your Claude list projects, create and update tasks, and comment, all as you.
