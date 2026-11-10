@@ -58,12 +58,7 @@ function TaskCard({ task, onClick }) {
         </div>
       )}
 
-      <div className="flex items-center justify-between mt-1">
-        {task.due_date && (
-          <span className="text-xs text-neutral-400">
-            Due Date: {new Date(task.due_date).toLocaleDateString()}
-          </span>
-        )}
+      <div className="flex items-center justify-end mt-1">
         {task.assignee && (
           <img
             src={`https://ui-avatars.com/api/?name=${task.assignee}&background=0D8ABC&color=fff`}

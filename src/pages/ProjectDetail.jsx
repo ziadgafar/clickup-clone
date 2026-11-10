@@ -10,6 +10,8 @@ export default function ProjectDetail() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [archived, setArchived] = useState([]);
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -30,7 +32,9 @@ export default function ProjectDetail() {
         ),
       ]);
       setProject(projectRow);
-      setTasks(taskRows.map((t) => ({ ...t, assignee: t.assignee?.name })));
+      const rows = taskRows.map((t) => ({ ...t, assignee: t.assignee?.name }));
+      setTasks(rows.filter((t) => !t.archived));
+      setArchived(rows.filter((t) => t.archived));
     } catch {
       setTasks([]);
     } finally {
@@ -51,12 +55,20 @@ export default function ProjectDetail() {
             {project?.description || "No description provided."}
           </p>
         </div>
+        <div className="flex gap-3">
+        <button
+          onClick={() => setShowArchived((v) => !v)}
+          className="px-4 py-2 border border-neutral-200 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 font-bold rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all cursor-pointer"
+        >
+          {showArchived ? "Hide archived" : `Archived (${archived.length})`}
+        </button>
         <button
           onClick={() => setShowModal(true)}
           className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-400 transition-all cursor-pointer"
         >
           + Create Task
         </button>
+        </div>
         {showModal && (
           <CreateTaskModal
             onClose={() => setShowModal(false)}
@@ -71,6 +83,34 @@ export default function ProjectDetail() {
         onTasksChange={setTasks}
         onRefresh={fetchData}
       />
+
+      {showArchived && (
+        <div className="mt-8 bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-wider text-neutral-500 mb-4">
+            Archived tasks
+          </h3>
+          {archived.length === 0 && (
+            <p className="text-sm text-neutral-400">Nothing archived.</p>
+          )}
+          {archived.map((t) => (
+            <div
+              key={t.id}
+              className="flex items-center justify-between py-2 border-b last:border-0 border-neutral-100 dark:border-neutral-700"
+            >
+              <span className="text-sm dark:text-white">{t.title}</span>
+              <button
+                onClick={async () => {
+                  await q(supabase.from("tasks").update({ archived: false }).eq("id", t.id));
+                  fetchData();
+                }}
+                className="text-xs font-bold text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer"
+              >
+                Restore
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

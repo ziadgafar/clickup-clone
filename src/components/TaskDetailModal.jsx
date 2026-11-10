@@ -19,7 +19,6 @@ export default function TaskDetailModal({
     status: task.status,
     priority: task.priority,
     assigned_to: task.assigned_to || "",
-    due_date: task.due_date?.split("T")[0] || "",
     tags: task.tags?.map((t) => t.id) || [],
   });
 
@@ -71,7 +70,6 @@ export default function TaskDetailModal({
           .update({
             ...fields,
             assigned_to: form.assigned_to || null,
-            due_date: form.due_date || null,
           })
           .eq("id", task.id),
       );
@@ -104,6 +102,15 @@ export default function TaskDetailModal({
       fetchComments();
     } catch {
       alert("Failed to delete comment.");
+    }
+  };
+
+  const handleArchive = async () => {
+    try {
+      await q(supabase.from("tasks").update({ archived: true }).eq("id", task.id));
+      onUpdated();
+    } catch (err) {
+      alert(err.message || "Failed to archive task.");
     }
   };
 
@@ -141,6 +148,14 @@ export default function TaskDetailModal({
           <div className="flex items-center gap-5">
             {!isEditing && (
               <button
+                onClick={handleArchive}
+                className="px-2 py-1 text-xs font-bold border border-neutral-200 dark:border-neutral-600 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer"
+              >
+                Archive
+              </button>
+            )}
+            {!isEditing && (
+              <button
                 onClick={() => setIsEditing(true)}
                 className="flex-1 px-2 py-1 text-xs font-bold border border-neutral-200 dark:border-neutral-600 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer"
               >
@@ -170,12 +185,6 @@ export default function TaskDetailModal({
                 {task.assignee && (
                   <span>
                     <b>Assignee:</b> {task.assignee}
-                  </span>
-                )}
-                {task.due_date && (
-                  <span>
-                    <b>Due Date:</b>{" "}
-                    {new Date(task.due_date).toLocaleDateString()}
                   </span>
                 )}
               </div>
@@ -262,16 +271,6 @@ export default function TaskDetailModal({
                       </option>
                     ))}
                   </select>
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-neutral-400 text-xs pb-0.5">Due Date</p>
-                  <input
-                    name="due_date"
-                    type="date"
-                    value={form.due_date}
-                    onChange={handleChange}
-                    className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-                  />
                 </div>
               </div>
 

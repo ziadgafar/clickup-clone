@@ -12,8 +12,6 @@ export default function CreateProjectModal({ onClose, onCreated }) {
     type: "internal",
     client_id: "",
     owner_id: "",
-    start_date: "",
-    end_date: "",
   });
 
   useEffect(() => {
@@ -40,7 +38,6 @@ export default function CreateProjectModal({ onClose, onCreated }) {
       const payload = {
         ...form,
         client_id: form.client_id || null,
-        end_date: form.end_date || null,
       };
       await q(supabase.from("projects").insert(payload));
       onCreated();
@@ -153,29 +150,6 @@ export default function CreateProjectModal({ onClose, onCreated }) {
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-3">
-            <div className="flex flex-col">
-              <p className="text-neutral-400 text-xs pb-0.5">Start Date</p>
-              <input
-                name="start_date"
-                type="date"
-                value={form.start_date}
-                onChange={handleChange}
-                className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-              />
-            </div>
-            <div className="flex flex-col">
-              <p className="text-neutral-400 text-xs pb-0.5">End Date</p>
-              <input
-                name="end_date"
-                type="date"
-                value={form.end_date}
-                onChange={handleChange}
-                className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-              />
-            </div>
           </div>
 
           <div className="flex gap-3 mt-2">

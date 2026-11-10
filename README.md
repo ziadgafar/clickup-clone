@@ -10,7 +10,7 @@ React 19 · Vite · Tailwind 4 · React Router · @dnd-kit · Supabase (`@supaba
 
 ### 1. Supabase
 
-1. Create a project, open the **SQL Editor**, and run [`supabase/schema.sql`](supabase/schema.sql), then [`supabase/002_claude_access.sql`](supabase/002_claude_access.sql).
+1. Create a project, open the **SQL Editor**, and run [`supabase/schema.sql`](supabase/schema.sql), then [`supabase/002_claude_access.sql`](supabase/002_claude_access.sql), then [`supabase/003_archive_no_dates.sql`](supabase/003_archive_no_dates.sql).
 2. Under **Authentication → Providers → Email**, you may want to turn off "Confirm email" for a 4-person team.
 3. Have everyone sign up through the app, then **disable new signups** (Authentication → Settings) so nobody else can register.
 4. Make yourself admin:

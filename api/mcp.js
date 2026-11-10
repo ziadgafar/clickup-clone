@@ -7,14 +7,13 @@ import { createHash } from "node:crypto";
 const STATUSES = ["todo", "in_progress", "blocked", "review", "done"];
 const PRIORITIES = ["low", "medium", "high"];
 const TASK_COLS =
-  "id, project_id, title, description, status, priority, due_date, created_at, assignee:profiles!tasks_assigned_to_fkey(name, email), tags(name)";
+  "id, project_id, title, description, status, priority, archived, created_at, assignee:profiles!tasks_assigned_to_fkey(name, email), tags(name)";
 
 const taskFields = {
   title: { type: "string" },
   description: { type: "string" },
   status: { type: "string", enum: STATUSES },
   priority: { type: "string", enum: PRIORITIES },
-  due_date: { type: "string", description: "YYYY-MM-DD" },
   assignee_email: { type: "string", description: "Team member email; see list_team" },
   tags: { type: "array", items: { type: "string" }, description: "Existing tag names; replaces current tags" },
 };
@@ -25,13 +24,14 @@ const TOOLS = [
   { name: "list_tags", description: "List available task tags.", inputSchema: { type: "object", properties: {} } },
   {
     name: "list_tasks",
-    description: "List tasks, optionally filtered by project, status, or only those assigned to me.",
+    description: "List active tasks, optionally filtered by project, status, or only those assigned to me. Archived tasks are hidden unless include_archived.",
     inputSchema: {
       type: "object",
       properties: {
         project_id: { type: "integer" },
         status: { type: "string", enum: STATUSES },
         mine: { type: "boolean", description: "Only tasks assigned to me" },
+        include_archived: { type: "boolean", description: "Also return archived tasks" },
       },
     },
   },
@@ -54,7 +54,11 @@ const TOOLS = [
     description: "Update fields of a task. Only provided fields change. assignee_email \"\" unassigns.",
     inputSchema: {
       type: "object",
-      properties: { task_id: { type: "integer" }, ...taskFields },
+      properties: {
+        task_id: { type: "integer" },
+        ...taskFields,
+        archived: { type: "boolean", description: "true hides the task from the board; false restores it" },
+      },
       required: ["task_id"],
     },
   },
@@ -76,8 +80,6 @@ const TOOLS = [
         name: { type: "string" },
         description: { type: "string" },
         priority: { type: "string", enum: PRIORITIES },
-        start_date: { type: "string", description: "YYYY-MM-DD, default today" },
-        end_date: { type: "string", description: "YYYY-MM-DD" },
       },
       required: ["name"],
     },
@@ -121,7 +123,7 @@ const taskById = (db, id) => q(db.from("tasks").select(TASK_COLS).eq("id", id).s
 
 const handlers = {
   list_projects: (db) =>
-    q(db.from("projects").select("id, name, description, status, priority, start_date, end_date").order("id")),
+    q(db.from("projects").select("id, name, description, status, priority").order("id")),
   list_team: (db) => q(db.from("profiles").select("name, email, role").order("name")),
   list_tags: (db) => q(db.from("tags").select("name").order("name")),
 
@@ -130,6 +132,7 @@ const handlers = {
     if (a.project_id) query = query.eq("project_id", a.project_id);
     if (a.status) query = query.eq("status", a.status);
     if (a.mine) query = query.eq("assigned_to", userId);
+    if (!a.include_archived) query = query.eq("archived", false);
     return q(query);
   },
 
@@ -153,7 +156,6 @@ const handlers = {
           description: a.description ?? null,
           status: a.status ?? "todo",
           priority: a.priority ?? "medium",
-          due_date: a.due_date ?? null,
           assigned_to: a.assignee_email ? await userIdByEmail(db, a.assignee_email) : null,
           created_by: userId,
         })
@@ -167,7 +169,7 @@ const handlers = {
   update_task: async (db, a) => {
     check(a);
     const patch = {};
-    for (const k of ["title", "description", "status", "priority", "due_date"]) if (a[k] !== undefined) patch[k] = a[k];
+    for (const k of ["title", "description", "status", "priority", "archived"]) if (a[k] !== undefined) patch[k] = a[k];
     if (a.assignee_email !== undefined) patch.assigned_to = await userIdByEmail(db, a.assignee_email);
     if (Object.keys(patch).length) {
       const rows = await q(db.from("tasks").update(patch).eq("id", a.task_id).select("id"));
@@ -188,8 +190,6 @@ const handlers = {
           name: a.name,
           description: a.description ?? null,
           priority: a.priority ?? "medium",
-          start_date: a.start_date ?? new Date().toISOString().slice(0, 10),
-          end_date: a.end_date ?? null,
           status: "planning",
           type: "internal",
           owner_id: userId,

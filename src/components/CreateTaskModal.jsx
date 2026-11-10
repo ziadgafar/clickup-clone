@@ -12,7 +12,6 @@ export default function CreateTaskModal({ onClose, onCreated, projectId }) {
     status: "todo",
     priority: "medium",
     assigned_to: "",
-    due_date: "",
     tags: [],
   });
 
@@ -47,7 +46,6 @@ export default function CreateTaskModal({ onClose, onCreated, projectId }) {
             ...fields,
             project_id: projectId,
             assigned_to: form.assigned_to || null,
-            due_date: form.due_date || null,
             created_by: loggedInUser.id,
           })
           .select()
@@ -130,16 +128,6 @@ export default function CreateTaskModal({ onClose, onCreated, projectId }) {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-neutral-400 text-xs pb-0.5">Due Date</p>
-            <input
-              name="due_date"
-              type="date"
-              value={form.due_date}
-              onChange={handleChange}
-              className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-            />
           </div>
           <div className="flex flex-col">
             <p className="text-neutral-400 text-xs pb-0.5">Tags</p>

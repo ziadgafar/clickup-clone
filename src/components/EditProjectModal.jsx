@@ -12,8 +12,6 @@ export default function EditProjectModal({ project, onClose, onUpdated }) {
     type: project.type,
     client_id: project.client_id || "",
     owner_id: project.owner_id,
-    start_date: project.start_date?.split("T")[0] || "",
-    end_date: project.end_date?.split("T")[0] || "",
   });
 
   useEffect(() => {
@@ -43,7 +41,6 @@ export default function EditProjectModal({ project, onClose, onUpdated }) {
           .update({
             ...form,
             client_id: form.client_id || null,
-            end_date: form.end_date || null,
           })
           .eq("id", project.id),
       );
@@ -156,29 +153,6 @@ export default function EditProjectModal({ project, onClose, onUpdated }) {
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col">
-              <p className="text-neutral-400 text-xs pb-0.5">Start Date</p>
-              <input
-                name="start_date"
-                type="date"
-                value={form.start_date}
-                onChange={handleChange}
-                className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-              />
-            </div>
-            <div className="flex flex-col">
-              <p className="text-neutral-400 text-xs pb-0.5">End Date</p>
-              <input
-                name="end_date"
-                type="date"
-                value={form.end_date}
-                onChange={handleChange}
-                className="px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-transparent dark:text-white focus:outline-none"
-              />
-            </div>
           </div>
 
           <div className="flex gap-3 mt-2">

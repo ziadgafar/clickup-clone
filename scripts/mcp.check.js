@@ -52,3 +52,12 @@ const missing = await call("update_task", { task_id: 99, title: "y" }, fakeDb({ 
 assert.match(missing.result.content[0].text, /Task 99 not found/);
 
 console.log("mcp check ok");
+
+// list_tasks hides archived unless asked
+const lt = fakeDb({ tasks: [{ data: [] }, { data: [] }] });
+await call("list_tasks", {}, lt);
+assert.ok(lt.calls.some(([, m, col, v]) => m === "eq" && col === "archived" && v === false));
+lt.calls.length = 0;
+await call("list_tasks", { include_archived: true }, lt);
+assert.ok(!lt.calls.some(([, m, col]) => m === "eq" && col === "archived"));
+console.log("archive check ok");
