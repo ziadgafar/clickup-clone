@@ -4,7 +4,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-neutral-900">
       <Navbar />
-      <main className="px-6 lg:px-24 py-8">{children}</main>
+      <main className="px-4 sm:px-6 lg:px-24 py-6 sm:py-8">{children}</main>
     </div>
   );
 }

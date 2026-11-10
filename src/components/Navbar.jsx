@@ -47,7 +47,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="flex items-center justify-between gap-6 px-6 lg:px-24 py-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+    <nav className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 sm:px-6 lg:px-24 py-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
       <Link
         to="/projects"
         className="flex items-center shrink-0"
@@ -61,7 +61,7 @@ export default function Navbar() {
       </Link>
 
       {user?.approved && (
-        <div className="flex gap-6 whitespace-nowrap">
+        <div className="flex gap-6 whitespace-nowrap order-last w-full md:order-none md:w-auto">
           <Link
             to="/projects"
             className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
@@ -104,7 +104,7 @@ export default function Navbar() {
               className="w-8 h-8 rounded-full"
               alt="User"
             />
-            <span className="text-sm font-semibold dark:text-white">
+            <span className="hidden sm:inline text-sm font-semibold dark:text-white">
               {user.name}
             </span>
             <button

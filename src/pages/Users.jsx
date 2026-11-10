@@ -180,8 +180,8 @@ function EditUserModal({ user, onClose, onUpdated, isAdmin, isSelf }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-neutral-800 rounded-2xl p-8 w-full max-w-lg shadow-xl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 sm:p-8 w-full max-w-lg shadow-xl max-h-full overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-black text-black dark:text-white">
             Edit User

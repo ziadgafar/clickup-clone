@@ -33,7 +33,7 @@ export default function Register() {
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-neutral-900">
       <Navbar />
-      <div className="flex items-center justify-center mt-20 px-24">
+      <div className="flex items-center justify-center mt-20 px-4">
         <div className="bg-white dark:bg-neutral-800 p-8 rounded-2xl shadow-sm w-full max-w-md">
           <h2 className="text-3xl font-black text-black dark:text-white">
             Welcome to PSD Task Manager!

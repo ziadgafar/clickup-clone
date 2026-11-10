@@ -129,10 +129,10 @@ export default function TaskDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-neutral-800 rounded-2xl w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-8 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-6 sm:p-8 pb-4">
           <div className="flex items-center gap-2">
             <span
               className={`text-xs font-bold px-2 py-1 rounded-full ${STATUS_COLORS[task.status]}`}
@@ -171,7 +171,7 @@ export default function TaskDetailModal({
           </div>
         </div>
 
-        <div className="px-8 pb-8 flex flex-col gap-6">
+        <div className="px-6 sm:px-8 pb-6 sm:pb-8 flex flex-col gap-6">
           {/* View or Edit mode */}
           {!isEditing ? (
             <div>

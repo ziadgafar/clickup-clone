@@ -46,7 +46,7 @@ export default function ProjectDetail() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-black text-black dark:text-white">
             {project?.name}
