@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import EditProjectModal from "../components/EditProjectModal";
 import CreateProjectModal from "../components/CreateProjectModal";
+import KanbanBoard from "../components/KanbanBoard";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -12,10 +13,42 @@ export default function Projects() {
   const { user } = useAuth();
   const [editingProject, setEditingProject] = useState(null);
   const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
+  const [people, setPeople] = useState([]);
+  const [assignee, setAssignee] = useState(user?.name || "");
+  const [project, setProject] = useState("");
 
   useEffect(() => {
     fetchProjects();
+    fetchTasks();
+    q(supabase.from("profiles").select("name").eq("approved", true).order("name"))
+      .then((u) => setPeople(u.map((x) => x.name)))
+      .catch(() => {});
   }, []);
+
+  const fetchTasks = () =>
+    q(
+      supabase
+        .from("tasks")
+        .select(
+          "*, assignee:profiles!tasks_assigned_to_fkey(name), tags(id, name), project:projects(name)",
+        )
+        .eq("archived", false)
+        .order("id"),
+    )
+      .then((rows) =>
+        setTasks(
+          rows.map((t) => ({ ...t, assignee: t.assignee?.name, project: t.project?.name })),
+        ),
+      )
+      .catch(() => setTasks([]));
+
+  const visible = (t) =>
+    (!assignee || (assignee === "-" ? !t.assignee : t.assignee === assignee)) &&
+    (!project || String(t.project_id) === project);
+
+  const field =
+    "px-3 py-2 border border-neutral-200 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white text-sm flex-1 sm:flex-none";
 
   const fetchProjects = async () => {
     try {
@@ -35,6 +68,7 @@ export default function Projects() {
     try {
       await q(supabase.from("projects").delete().eq("id", id));
       fetchProjects();
+      fetchTasks();
     } catch {
       alert("Failed to delete project.");
     }
@@ -45,7 +79,7 @@ export default function Projects() {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-black text-black dark:text-white">
-            Projects
+            Tasks
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 mt-1">
             {projects.length} projects total
@@ -98,9 +132,11 @@ export default function Projects() {
               <h3 className="text-lg font-bold text-black dark:text-white mb-1">
                 {project.name}
               </h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                {project.description || "No description provided."}
-              </p>
+              {project.description && (
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  {project.description}
+                </p>
+              )}
               {canManage() && (
                 <div className="flex gap-2 mt-3">
                   <button
@@ -131,6 +167,34 @@ export default function Projects() {
           )}
         </div>
       )}
+
+      <div className="flex flex-wrap items-center gap-3 mt-10 mb-6">
+        <h2 className="text-xl font-black text-black dark:text-white basis-full sm:basis-auto sm:mr-auto">
+          {assignee === user?.name ? "My tasks" : "Tasks"}
+        </h2>
+        <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
+          <option value="">All assignees</option>
+          <option value="-">Unassigned</option>
+          {people.map((a) => (
+            <option key={a} value={a}>
+              {a === user?.name ? `${a} (me)` : a}
+            </option>
+          ))}
+        </select>
+        <select value={project} onChange={(e) => setProject(e.target.value)} className={field}>
+          <option value="">All projects</option>
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <KanbanBoard
+        tasks={tasks}
+        onTasksChange={setTasks}
+        onRefresh={fetchTasks}
+        visible={visible}
+      />
     </div>
   );
 }

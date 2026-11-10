@@ -70,11 +70,8 @@ export default function Navbar() {
       {user?.approved && (
         // Mobile: full-bleed tab strip under the logo row. md+: inline links.
         <div className="order-last basis-full grow -mx-4 sm:-mx-6 -mb-4 flex whitespace-nowrap border-t border-neutral-200 dark:border-neutral-700 md:order-0 md:basis-auto md:grow-0 md:m-0 md:gap-6 md:border-0">
-          <NavLink to="/dashboard" className={tab}>
-            My Tasks
-          </NavLink>
           <NavLink to="/projects" className={tab}>
-            Projects
+            Tasks
           </NavLink>
           {user.role === "admin" && (
             <NavLink to="/users" className={tab}>
