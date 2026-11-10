@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase, q } from "../supabase";
 import { useAuth } from "../context/AuthContext";
 import KanbanBoard from "../components/KanbanBoard";
+import AssigneePicker from "../components/AssigneePicker";
 import CreateTaskModal from "../components/CreateTaskModal";
 import CreateProjectModal from "../components/CreateProjectModal";
 import EditProjectModal from "../components/EditProjectModal";
@@ -27,7 +28,7 @@ export default function Tasks() {
   const created = params.get("created") || "";
   const setParam = (key) => (e) => {
     const next = new URLSearchParams(params);
-    next.set(key, e.target.value);
+    next.set(key, e.target?.value ?? e);
     setParams(next, { replace: true });
   };
 
@@ -148,15 +149,13 @@ export default function Tasks() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <select value={assignee} onChange={setParam("assignee")} className={field}>
-          <option value="">All assignees</option>
-          <option value="-">Unassigned</option>
-          {people.map((a) => (
-            <option key={a} value={a}>
-              {a === user.name ? `${a} (me)` : a}
-            </option>
-          ))}
-        </select>
+        <AssigneePicker
+          value={assignee}
+          onChange={setParam("assignee")}
+          people={people}
+          me={user.name}
+          className="flex-1 sm:flex-none sm:w-52"
+        />
         <label className="relative flex flex-1 sm:flex-none">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"

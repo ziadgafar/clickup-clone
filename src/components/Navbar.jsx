@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import Avatar from "./Avatar";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
@@ -95,14 +96,11 @@ export default function Navbar() {
 
         {user ? (
           <div className="flex items-center gap-3 pl-4 border-l border-neutral-200 dark:border-neutral-700">
-            <img
-              src={
-                user.profile_picture ||
-                `https://ui-avatars.com/api/?name=${user.name}&background=0D8ABC&color=fff`
-              }
-              className="w-8 h-8 rounded-full"
-              alt="User"
-            />
+            {user.profile_picture ? (
+              <img src={user.profile_picture} className="w-8 h-8 rounded-full" alt="User" />
+            ) : (
+              <Avatar name={user.name} className="w-8 h-8 text-xs" />
+            )}
             <span className="hidden sm:inline text-sm font-semibold dark:text-white">
               {user.name}
             </span>
