@@ -63,14 +63,18 @@ function TaskCard({ task, onClick }) {
         </div>
       )}
 
-      <div className="flex items-center justify-end mt-1">
-        {task.assignee && (
+      {task.assignee && (
+        <div className="flex items-center gap-2 mt-1">
           <img
-            src={`https://ui-avatars.com/api/?name=${task.assignee}&background=0D8ABC&color=fff`}
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(task.assignee)}&background=0D8ABC&color=fff`}
+            alt=""
             className="w-6 h-6 rounded-full"
           />
-        )}
-      </div>
+          <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate">
+            {task.assignee}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

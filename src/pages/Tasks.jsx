@@ -157,13 +157,22 @@ export default function Tasks() {
             </option>
           ))}
         </select>
-        <select value={created} onChange={setParam("created")} className={field}>
+        <label className="relative flex flex-1 sm:flex-none">
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+        <select value={created} onChange={setParam("created")} aria-label="Created" className={`${field} pl-9 w-full`}>
           <option value="">Created any time</option>
           <option value="today">Created today</option>
           <option value="7">Last 7 days</option>
           <option value="30">Last 30 days</option>
           <option value="90">Last 90 days</option>
         </select>
+        </label>
         <button onClick={() => setShowArchived((v) => !v)} className={small}>
           {showArchived ? "Hide archived" : `Archived (${archived.length})`}
         </button>
