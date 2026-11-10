@@ -1,20 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
-import Clients from "./pages/Clients";
 import Users from "./pages/Users";
+import ConnectClaude from "./pages/ConnectClaude";
 import Layout from "./components/Layout";
 
-function ProtectedRoute({ children }) {
+// Hidden for now (files kept): Home, Dashboard, Clients.
+
+function ProtectedRoute({ children, adminOnly }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  return user ? <Layout>{children}</Layout> : <Navigate to="/" />;
+  if (!user) return <Navigate to="/login" />;
+  if (adminOnly && user.role !== "admin") return <Navigate to="/projects" />;
+  return <Layout>{children}</Layout>;
 }
 
 export default function App() {
@@ -23,17 +25,8 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
             <Route
               path="/projects"
               element={
@@ -51,21 +44,22 @@ export default function App() {
               }
             />
             <Route
-              path="/clients"
-              element={
-                <ProtectedRoute>
-                  <Clients />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/users"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly>
                   <Users />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/connect"
+              element={
+                <ProtectedRoute>
+                  <ConnectClaude />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/projects" />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>

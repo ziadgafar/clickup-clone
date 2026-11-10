@@ -43,13 +43,13 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
     <nav className="flex items-center justify-between px-24 py-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
       <Link
-        to="/"
+        to="/projects"
         className="flex items-center"
       >
         {/* Navy wordmark is unreadable on dark bg, so render it white there */}
@@ -63,28 +63,24 @@ export default function Navbar() {
       {user && (
         <div className="flex gap-6">
           <Link
-            to="/dashboard"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
-          >
-            Dashboard
-          </Link>
-          <Link
             to="/projects"
             className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
           >
             Projects
           </Link>
+          {user.role === "admin" && (
+            <Link
+              to="/users"
+              className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
+            >
+              Team
+            </Link>
+          )}
           <Link
-            to="/clients"
+            to="/connect"
             className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
           >
-            Clients
-          </Link>
-          <Link
-            to="/users"
-            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-600"
-          >
-            Team
+            Connect Claude
           </Link>
         </div>
       )}
