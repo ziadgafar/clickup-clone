@@ -199,7 +199,7 @@ export default function TaskDetailModal({
               <h2 className="text-2xl font-black text-black dark:text-white mb-2">
                 {task.title}
               </h2>
-              <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm whitespace-pre-wrap break-words">
                 {task.description || "No description provided."}
               </p>
               <div className="flex gap-4 mt-4 text-sm text-neutral-500">
