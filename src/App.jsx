@@ -7,6 +7,7 @@ import Tasks from "./pages/Tasks";
 import Users from "./pages/Users";
 import ConnectClaude from "./pages/ConnectClaude";
 import Layout from "./components/Layout";
+import Landing from "./pages/Landing";
 
 // Hidden for now (files kept): Home, Clients.
 
@@ -38,6 +39,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route
