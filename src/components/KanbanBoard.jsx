@@ -56,8 +56,12 @@ function TaskCard({ task, onClick }) {
   );
 }
 
+const COLLAPSED_LIMIT = 5;
+
 function KanbanColumn({ column, tasks, onTaskClick }) {
   const { ref } = useDroppable({ id: column });
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? tasks : tasks.slice(0, COLLAPSED_LIMIT);
 
   return (
     <div
@@ -76,13 +80,21 @@ function KanbanColumn({ column, tasks, onTaskClick }) {
       </div>
 
       <div className="flex flex-col gap-3">
-        {tasks.map((task) => (
+        {shown.map((task) => (
           <TaskCard
             key={task.id}
             task={task}
             onClick={() => onTaskClick(task)}
           />
         ))}
+        {tasks.length > COLLAPSED_LIMIT && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs font-bold text-neutral-500 hover:text-black dark:hover:text-white py-2 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700"
+          >
+            {expanded ? "Show less" : `View ${tasks.length - COLLAPSED_LIMIT} more`}
+          </button>
+        )}
         {tasks.length === 0 && (
           <div className="h-24 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center text-neutral-400 text-xs">
             Drop tasks here
