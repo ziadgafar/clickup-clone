@@ -60,8 +60,9 @@ const COLLAPSED_LIMIT = 5;
 
 function KanbanColumn({ column, tasks, onTaskClick }) {
   const { ref } = useDroppable({ id: column });
-  const [expanded, setExpanded] = useState(false);
-  const shown = expanded ? tasks : tasks.slice(0, COLLAPSED_LIMIT);
+  const [limit, setLimit] = useState(COLLAPSED_LIMIT);
+  const shown = tasks.slice(0, limit);
+  const remaining = tasks.length - shown.length;
 
   return (
     <div
@@ -87,12 +88,20 @@ function KanbanColumn({ column, tasks, onTaskClick }) {
             onClick={() => onTaskClick(task)}
           />
         ))}
-        {tasks.length > COLLAPSED_LIMIT && (
+        {remaining > 0 && (
           <button
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => setLimit(limit + COLLAPSED_LIMIT)}
             className="text-xs font-bold text-neutral-500 hover:text-black dark:hover:text-white py-2 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700"
           >
-            {expanded ? "Show less" : `View ${tasks.length - COLLAPSED_LIMIT} more`}
+            View {Math.min(remaining, COLLAPSED_LIMIT)} more ({remaining} left)
+          </button>
+        )}
+        {limit > COLLAPSED_LIMIT && (
+          <button
+            onClick={() => setLimit(COLLAPSED_LIMIT)}
+            className="text-xs font-bold text-neutral-400 hover:text-black dark:hover:text-white py-1"
+          >
+            Show less
           </button>
         )}
         {tasks.length === 0 && (
