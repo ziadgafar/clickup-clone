@@ -66,7 +66,7 @@ function KanbanColumn({ column, tasks, onTaskClick }) {
   return (
     <div
       ref={ref}
-      className={`rounded-2xl border-2 ${COLUMN_COLORS[column]} p-4 md:min-h-125 bg-neutral-50/50 dark:bg-neutral-900/20 transition-colors`}
+      className={`rounded-2xl border-2 ${COLUMN_COLORS[column]} p-4 bg-neutral-50/50 dark:bg-neutral-900/20 transition-colors`}
     >
       <div className="flex items-center justify-between mb-4">
         <h3
@@ -136,7 +136,7 @@ export default function KanbanBoard({ tasks, onTasksChange, onRefresh, visible =
 
   return (
     <DragDropProvider onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col}
